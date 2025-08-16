@@ -15,6 +15,7 @@ index = faiss.read_index("biochem_index.faiss")
 def load_chunks(chunks_filename):
     with open(chunks_filename, "rb") as f:
         chunks = pickle.load(f)
+    print(f"[yellow]Chunks loaded from {chunks_filename} with {len(chunks)} chunks![/yellow]")
     return chunks
 
 def fetch_context_chunks(user_query, chunks):
@@ -27,10 +28,11 @@ def fetch_context_chunks(user_query, chunks):
     query_vector = np.array(response.data[0].embedding, dtype=np.float32).reshape(1, -1)
 
     # Retrieve 5 closest chunks, we can play around with this number
+    # Todo: Distance threshold based out of context filter
     k = 5
     distances, indices = index.search(query_vector, k)
     closest_chunks = [chunks[i] for i in indices[0]]
-
+    print(f"[yellow]{k} chunks were discvered with distances {distances} at {indices}, respectively![/yellow]")
     return closest_chunks
 
 def ask_textbook(user_input, chunks):
@@ -56,7 +58,7 @@ def ask_textbook(user_input, chunks):
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}]
     )
-    
+    print("[yellow]Response from OpenAI retrieved![/yellow]")
     return response.choices[0].message.content
 
 user_input = Prompt.ask("[yellow]What would you like to ask your textbook???\n[/yellow]")
