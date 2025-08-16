@@ -2,10 +2,11 @@ import faiss
 import pickle
 import os
 import numpy as np
-from openai import OpenAI
-from sentence_transformers import SentenceTransformer
-from transformers import pipeline
 import warnings
+from openai import OpenAI
+from rich import print
+from rich.prompt import Prompt
+
 warnings.filterwarnings("ignore", category=UserWarning, module="urllib3")
 
 client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
@@ -58,11 +59,11 @@ def ask_textbook(user_input, chunks):
     
     return response.choices[0].message.content
 
-user_input = input("What would you like to ask your textbook??? ")
+user_input = Prompt.ask("[yellow]What would you like to ask your textbook???\n[/yellow]")
 chunks = load_chunks("chunks.pkl")
 context_chunks = fetch_context_chunks(user_input, chunks)
 response = ask_textbook(user_input, context_chunks)
-print(response)
+print(f"[green]{response}[/green]")
 
 
 # index = faiss.read_index("biochem_index.faiss")
